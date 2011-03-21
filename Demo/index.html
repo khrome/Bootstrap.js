@@ -1,0 +1,107 @@
+<html>
+<head>
+<script origin="bootstrap" type="text/javascript" src="../Source/Bootstrap.js"></script>
+<script origin="bootstrap">
+    Bootstrap.load(
+        [
+            {
+                name : 'MooTools',
+                signature : 'document.id',
+                location : 'js/mootools-core-1.3-full-nocompat.js'
+            },
+            {
+                name : 'MooTools.More',
+                location : 'js/mootools-more.js',
+                depends : ['MooTools']
+            },
+            {
+                name : 'DebugLogger',
+                location : 'js/ba-debug.js'
+            },
+            {
+                name : 'GlobalStyle',
+                location : 'styles/style.css'
+            },
+            {
+                name : 'GlobalData',
+                location : 'data/global.json'
+            },
+            /*{
+                name : 'Midas',
+                location : 'js/Midas.min.js',
+                depends : ['MooTools']
+            }
+            //*/
+            {
+                name : 'Midas.Smarty',
+                location : 'js/Midas.Smarty.js',
+                depends : ['MooTools', 'Midas.SAXParser']
+            },
+            {
+                name : 'Midas.INIParser',
+                location : 'js/Midas.INIParser.js',
+                depends : ['MooTools']
+            },
+            {
+                name : 'Midas.PropertiesParser',
+                location : 'js/Midas.PropertiesParser.js',
+                depends : ['MooTools']
+            },
+            {
+                name : 'Midas.SCSSParser',
+                location : 'js/Midas.SCSSParser.js',
+                depends : ['MooTools']
+            },
+            {
+                name : 'Midas.CSSParser',
+                location : 'js/Midas.CSSParser.js',
+                depends : ['MooTools']
+            },
+            {
+                name : 'Midas.SAXParser',
+                location : 'js/Midas.SAXParser.js',
+                depends : ['MooTools']
+            }
+        ],
+        function(){
+            // now we have our base environment, let's now load some more resources for our app
+            Bootstrap.log('Simple environment loaded!');
+            Midas.enableBootstrapHandlers(); //enable midas extensions
+            Bootstrap.load(
+                [
+                    {
+                        name : 'NewsFeed',
+                        location : 'templates/news.tpl',
+                        depends : ['NewsData'],
+                        data : 'data/news.json'
+                    },
+                    {
+                        name : 'NewsData',
+                        location : 'data/news.json'
+                    },
+                    {
+                        name : 'UserPanel',
+                        location : 'templates/user.tpl',
+                        depends : ['UserData'],
+                        data : 'data/user.json'
+                    },
+                    {
+                        name : 'UserData',
+                        location : 'data/user.json'
+                    }
+                ],
+                function(){
+                    // we have everything to build our page, use the resources to make it happen
+                    document.body.innerHTML = Bootstrap.smarty.render['UserPanel']+'<hr/>'+Bootstrap.smarty.render['NewsFeed'].join('<hr/>');
+                    console.log(['Load Complete, check the log: ', Bootstrap.logBuffer]);
+                    console.log(['Bootstrap object:', Bootstrap]);
+                }
+            );
+            // do something here to make things pretty and zoomy while the advanced environment comes up
+        }
+    );
+</script>
+</head>
+<body>
+</body>
+</html>
