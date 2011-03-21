@@ -191,14 +191,10 @@ if(!Bootstrap.checkCSS){
         for(var lcv=0; lcv < head.length; lcv++){
             var requeue = "Bootstrap.checkCSS('"+filename+"', '"+loadID+"');";
             if(head[lcv].type=='text/css' && base==head[lcv].href){ // this is the css file we're looking for
-                try{
-                    if(head[lcv].getAttribute('onload')){
-                        if(eval(requirement.callback.functionID)){
-                            requirement.callback.func();
-                        }
+                if(head[lcv].getAttribute('onload')){
+                    if(eval(requirement.callback.functionID)){
+                        requirement.callback.func();
                     }
-                }catch(ex){
-                    console.log(['fail', ex, requirement]);
                 }
                 found = true;
             }
@@ -223,13 +219,14 @@ if(!Bootstrap.http){
     Bootstrap.files = {};
     Bootstrap.http = function(file, callback){
         var req = new XMLHttpRequest();
-        req.onreadystatechange = function(response){
+        req.onreadystatechange = function(res){
             if (req.readyState == 4) {
                 if (req.status == 200) {
-                    if(response.srcElement) response = response.srcElement;
-                    this.files[file] = response.responseText;
+                    if(res.srcElement) res = res.srcElement;
+                    if(res.originalTarget) res = res.originalTarget;
+                    this.files[file] = res.responseText;
                     Bootstrap.log('file '+file+' fetched.');
-                    callback(response.responseText);
+                    callback(res.responseText);
                 } else {
                     Bootstrap.log('There was an error fetching the file: '+filename);
                 }
@@ -259,7 +256,7 @@ Bootstrap.data = {};
 Bootstrap.setHandler('json', function(requirement){
     this.http(requirement.location, function(text){
         try{
-            //todo: make sure we are executing arbitrary code
+            //todo: make sure we aren't executing arbitrary code
             eval('var json = '+text+';');
             Bootstrap.data[requirement.location] = json;
             if(requirement.callback.func) requirement.callback.func(json);
@@ -357,7 +354,6 @@ Midas.enableBootstrapHandlers = function(){
                     var result = [];
                     requirement.data.each(function(row){
                         if(typeof requirement.data != 'object') throw('classes required to be nested inside complex data! ('+(typeof requirement.data)+' found.)');
-                        try{
                         for(key in row) smartyInstance.assign(key, row[key]);
                         smartyInstance.fetch(filename, function(renderedTemplate){
                             result.push(renderedTemplate);
@@ -367,9 +363,6 @@ Midas.enableBootstrapHandlers = function(){
                                 requirement.callback.func(result);
                             }
                         }.bind(this));
-                        }catch(ex){
-                            console.log(['EXX', ex]);
-                        }
                         //smartyInstance = new Midas.Smarty({ template_directory : directory });
                     }.bind(this));
                 }else{ //it's a class
